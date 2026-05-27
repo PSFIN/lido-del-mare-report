@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lido Del Mare – Projection Report</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0d3d42; }
+  #scaler-wrap {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    overflow: hidden; display: flex; align-items: center; justify-content: center; background: #0d3d42;
+  }
+  #slide {
+    width: 1400px; height: 900px; transform-origin: center center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f2f5; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: #0d3d42; height: 58px; display: flex; align-items: center;
+    padding: 0 20px; gap: 14px; border-bottom: 2px solid rgba(255,255,255,0.07); flex-shrink: 0;
+  }
+  .hdr-logo { flex-shrink: 0; display: flex; align-items: center; gap: 10px; }
+  .hdr-rule { width: 2px; height: 32px; background: rgba(255,255,255,0.22); border-radius: 1px; flex-shrink: 0; }
+  .hdr-info { flex: 1; min-width: 0; }
+  .hdr-title { color: #fff; font-size: 14.5px; font-weight: 800; letter-spacing: 0.4px; }
+  .hdr-sub { color: rgba(255,255,255,0.48); font-size: 10px; margin-top: 2px; }
+  .hdr-badge {
+    flex-shrink: 0; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px; padding: 4px 14px; color: rgba(255,255,255,0.75);
+    font-size: 11px; font-weight: 800; letter-spacing: 3px;
+  }
+
+  /* ── Body ── */
+  .body { flex: 1; display: flex; flex-direction: column; padding: 14px 18px 10px; gap: 10px; min-height: 0; }
+
+  /* ── Legend ── */
+  .legend { display: flex; align-items: center; gap: 24px; flex-shrink: 0; }
+  .leg-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: #4a5568; }
+  .leg-swatch { width: 22px; height: 22px; border-radius: 4px; flex-shrink: 0; }
+  .leg-green  { background: #6db33f; }
+  .leg-yellow { background: #c8d400; }
+  .leg-gray   { background: #c8cdd4; }
+
+  /* ── Table card ── */
+  .table-card {
+    flex: 1; min-height: 0; background: white; border-radius: 10px;
+    border: 1px solid #e0e4ea; box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; height: 100%; }
+
+  /* Column widths */
+  col.label-col { width: 140px; }
+  col.month-col { width: 92px; }
+  col.avg-col   { width: 110px; }
+
+  /* Header row */
+  thead th {
+    background: #0d3d42; color: rgba(255,255,255,0.9);
+    font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+    padding: 12px 6px; text-align: center;
+  }
+  thead th.lh { text-align: left; padding-left: 20px; background: #0d3d42; }
+  thead th.avg-th {
+    background: #1a6870; color: #fff; font-size: 14px; font-weight: 800;
+  }
+
+  /* Body rows */
+  tbody tr { border-bottom: 1px solid #eef0f4; }
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody td {
+    font-size: 15px; font-weight: 700; text-align: center;
+    padding: 0; color: #1a2a3a; vertical-align: middle;
+  }
+  tbody td.label-cell {
+    text-align: left; padding-left: 20px;
+    font-size: 14px; font-weight: 800; color: #2d3748;
+    background: #fafbfc; border-right: 1px solid #e0e4ea;
+  }
+  tbody td.avg-cell {
+    background: #1a6870; color: #fff;
+    font-size: 20px; font-weight: 900;
+  }
+  tbody tr.adr-row td.avg-cell { font-size: 20px; }
+
+  /* Season colour cells (only for Occ row) */
+  td.s-green  { background: rgba(109,179,63,0.18); }
+  td.s-yellow { background: rgba(200,212,0,0.20); }
+  td.s-gray   { background: rgba(180,188,198,0.18); }
+
+  /* Revenue row bg */
+  tbody tr.rev-row td { background: #f8fafc; }
+  tbody tr.rev-row td.avg-cell { background: #1a6870; }
+  tbody tr.rev-row td.label-cell { background: #f0f2f5; }
+
+  /* Disclaimer */
+  .disclaimer {
+    font-size: 10.5px; color: #94a3b8; line-height: 1.55;
+    padding: 0 4px; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+<div id="scaler-wrap">
+<div id="slide">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="hdr-logo">
+      <img src="logo.jpg" alt="Lido Del Mare" style="height:38px;width:38px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
+      <svg height="34" viewBox="0 0 220 34" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="24" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif"
+          font-size="20" font-weight="900" fill="#ffffff" letter-spacing="1.5" opacity="0.92">LIDO DEL MARE</text>
+      </svg>
+    </div>
+    <div class="hdr-rule"></div>
+    <div class="hdr-info">
+      <div class="hdr-title">Projection Report &mdash; Based on Historical Property Performance</div>
+      <div class="hdr-sub">ADR &nbsp;&middot;&nbsp; Occupancy Nights &nbsp;&middot;&nbsp; Gross Booking Revenue &nbsp;&middot;&nbsp; Annual Projection</div>
+    </div>
+    <div class="hdr-badge">PROJECTION</div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="leg-item"><div class="leg-swatch leg-green"></div>Probable (High Season)</div>
+      <div class="leg-item"><div class="leg-swatch leg-yellow"></div>Possible (Mid Season)</div>
+      <div class="leg-item"><div class="leg-swatch leg-gray"></div>Opportunity (Low Season &mdash; pricing aggression required by owner to realize potential opportunity)</div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-card">
+      <table>
+        <colgroup>
+          <col class="label-col">
+          <col class="month-col"><col class="month-col"><col class="month-col"><col class="month-col">
+          <col class="month-col"><col class="month-col"><col class="month-col"><col class="month-col">
+          <col class="month-col"><col class="month-col"><col class="month-col"><col class="month-col">
+          <col class="avg-col">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="lh"></th>
+            <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th>
+            <th>May</th><th>Jun</th><th>Jul</th><th>Aug</th>
+            <th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th>
+            <th class="avg-th">Average</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- ADR -->
+          <tr class="adr-row">
+            <td class="label-cell">ADR</td>
+            <td>$189</td><td>$237</td><td>$233</td><td>$107</td>
+            <td>$71</td><td>$71</td><td>$142</td><td>$71</td>
+            <td style="color:#b0bec5;">—</td><td style="color:#b0bec5;">—</td><td>$92</td><td>$142</td>
+            <td class="avg-cell">$113</td>
+          </tr>
+
+          <!-- Occupancy -->
+          <tr class="occ-row">
+            <td class="label-cell">Occ <span style="font-size:11px;font-weight:600;color:#94a3b8;">(nights)</span></td>
+            <td class="s-green">29</td><td class="s-green">27</td><td class="s-green">30</td><td class="s-yellow">14</td>
+            <td class="s-gray">14</td><td class="s-gray">14</td><td class="s-gray">14</td><td class="s-gray">14</td>
+            <td class="s-gray" style="color:#b0bec5;">0</td><td class="s-gray" style="color:#b0bec5;">0</td><td class="s-gray">14</td><td class="s-yellow">14</td>
+            <td class="avg-cell">59%</td>
+          </tr>
+
+          <!-- Revenue -->
+          <tr class="rev-row">
+            <td class="label-cell">Gross Booking<br>Revenue</td>
+            <td>$5,499</td><td>$6,399</td><td>$6,999</td><td>$1,499</td>
+            <td>$999</td><td>$999</td><td>$1,999</td><td>$999</td>
+            <td style="color:#b0bec5;">$0</td><td style="color:#b0bec5;">$0</td><td>$1,299</td><td>$1,999</td>
+            <td class="avg-cell">$28,389</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      * Reported Revenue is historic and not a guaranteed projection. Our pricing strategy is dynamic which means these values will change as market conditions change.<br>
+      We keep eyes on market conditions daily and will be sure to maximize revenue potential where possible.
+    </div>
+
+  </div><!-- /body -->
+
+</div></div>
+
+<div id="fixed-nav" style="position:fixed;bottom:22px;left:0;right:0;padding:0 28px;z-index:9999;display:flex;justify-content:flex-start;pointer-events:none;">
+  <span style="pointer-events:auto;">
+    <a href="slide3.html" style="background:#1a6870;color:white;text-decoration:none;border-radius:16px;padding:9px 22px;font-size:13px;font-weight:700;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.25);">&#8592; Prev</a>
+  </span>
+</div>
+
+<script>
+function scaleSlide() {
+  var vp = window.visualViewport;
+  var w = vp ? vp.width : document.documentElement.clientWidth;
+  var h = vp ? vp.height : document.documentElement.clientHeight;
+  document.getElementById('slide').style.transform = 'scale(' + Math.min(w/1400, h/900) + ')';
+}
+scaleSlide();
+window.addEventListener('resize', scaleSlide);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', scaleSlide);
+</script>
+</body>
+</html>
